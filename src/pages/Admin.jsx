@@ -20,7 +20,7 @@ const Admin = () => {
         }
 
         console.log('Fetching admin stats...'); // Debug log
-        const response = await fetch('http://localhost:5000/api/admin/stats', {
+        const response = await fetch('http://13.232.194.242:5000/api/admin/stats', {
           headers: {
             'x-auth-token': token,
             'Content-Type': 'application/json'

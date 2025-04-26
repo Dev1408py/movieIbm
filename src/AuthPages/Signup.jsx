@@ -73,7 +73,7 @@ function Signup() {
     if (Object.keys(newErrors).length === 0) {
       setLoading(true);
       try {
-        const response = await fetch('/api/users/signup', {
+        const response = await fetch('http://13.232.194.242:5000/api/users/signup', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -107,6 +107,8 @@ function Signup() {
         // Store the token and userId in localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('userId', data.userId);
+        localStorage.setItem('username', formData.username);
+        localStorage.setItem('email', formData.email);
 
         // Store user data
         localStorage.setItem('user', JSON.stringify({

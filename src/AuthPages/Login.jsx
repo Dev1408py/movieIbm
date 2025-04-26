@@ -42,7 +42,7 @@ function Login() {
     if (Object.keys(newErrors).length === 0) {
       setLoading(true);
       try {
-        const response = await fetch('/api/users/login', {
+        const response = await fetch('http://13.232.194.242:5000/api/users/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -59,6 +59,8 @@ function Login() {
         // Store the token in localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('userId', data.userId);
+        localStorage.setItem('username', data.username);
+        localStorage.setItem('email', data.email);
 
         // Update global state if needed
         // For example, you might want to set a global auth state here

@@ -117,7 +117,7 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch('http://localhost:5000/api/admin/users', {
+      const response = await fetch('http://13.232.194.242:5000/api/admin/users', {
         headers: {
           'x-auth-token': token
         }
@@ -149,8 +149,8 @@ const AdminUsers = () => {
     try {
       const token = localStorage.getItem('adminToken');
       const url = editingUser 
-        ? `http://localhost:5000/api/admin/users/${editingUser._id}`
-        : 'http://localhost:5000/api/admin/users';
+        ? `http://13.232.194.242:5000/api/admin/users/${editingUser._id}`
+        : 'http://13.232.194.242:5000/api/admin/users';
       
       const method = editingUser ? 'PUT' : 'POST';
 
@@ -206,7 +206,7 @@ const AdminUsers = () => {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+      const response = await fetch(`http://13.232.194.242:5000/api/admin/users/${userId}`, {
         method: 'DELETE',
         headers: {
           'x-auth-token': token

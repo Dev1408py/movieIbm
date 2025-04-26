@@ -3,6 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const { authenticateUser } = require('../middleware/auth');
 
 // User Signup
 router.post('/signup', async (req, res) => {
@@ -22,11 +23,16 @@ router.post('/signup', async (req, res) => {
     // Generate token
     const token = jwt.sign(
       { id: user._id, username: user.username, role: 'user' },
-      process.env.JWT_SECRET,
+      '1234',
       { expiresIn: '1h' }
     );
 
-    res.status(201).json({ token, userId: user._id });
+    res.status(201).json({ 
+      token, 
+      userId: user._id,
+      username: user.username,
+      email: user.email
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -52,11 +58,29 @@ router.post('/login', async (req, res) => {
     // Generate token
     const token = jwt.sign(
       { id: user._id, username: user.username, role: 'user' },
-      process.env.JWT_SECRET,
+      '1234',
       { expiresIn: '1h' }
     );
 
-    res.json({ token, userId: user._id });
+    res.json({ 
+      token, 
+      userId: user._id,
+      username: user.username,
+      email: user.email
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get user data by ID
+router.get('/:id', authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -5,10 +5,12 @@ import Signup from "./AuthPages/Signup";
 import ForgotPass from "./AuthPages/ForgotPass";
 import AdminLogin from "./AuthPages/AdminLogin";
 import Dashboard from "./pages/Dashboard";
-import Main from "./pages/main";
+import Home from "./pages/Home";
 import Admin from "./pages/Admin";
 import AdminMovies from "./pages/AdminMovies";
 import AdminUsers from "./pages/AdminUsers";
+import Profile from "./pages/Profile";
+import WatchMovie from "./pages/WatchMovie";
 
 // Protected Route component for admin dashboard
 const ProtectedAdminRoute = ({ children }) => {
@@ -21,9 +23,19 @@ const ProtectedAdminRoute = ({ children }) => {
   return children;
 };
 
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+  return children;
+};
+
 const AppRoutes = () => {
   return (
     <Routes>
+      <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/forgotpassword" element={<ForgotPass />} />
@@ -52,7 +64,16 @@ const AppRoutes = () => {
           </ProtectedAdminRoute>
         }
       />
-      <Route path="/" element={<Main />} />
+      <Route path="/profile" element={
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      } />
+      <Route path="/watch/:movieId" element={
+        <ProtectedRoute>
+          <WatchMovie />
+        </ProtectedRoute>
+      } />
     </Routes>
   );
 };

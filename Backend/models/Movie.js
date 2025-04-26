@@ -3,35 +3,43 @@ const mongoose = require('mongoose');
 const movieSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
-  director: {
+  description: {
     type: String,
     required: true
-  },
-  year: {
-    type: Number,
-    required: true
-  },
-  genre: {
-    type: [String],
-    required: true
-  },
-  rating: {
-    type: Number,
-    min: 0,
-    max: 10,
-    default: 2
-  },
-  description: String,
-  createdAt: {
-    type: Date,
-    default: Date.now
   },
   image: {
     type: String,
-    default: 'https://img.freepik.com/free-psd/music-shop-poster-template_23-2148855476.jpg'
+    default: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1"
+  },
+  rating: {
+    type: String,
+    default: "8.0"
+  },
+  duration: {
+    type: String,
+    default: "2h"
+  },
+  genre: [{
+    type: String,
+    default: ["Action", "Drama"]
+  }],
+  director: {
+    type: String,
+    default: "Various"
+  },
+  year: {
+    type: String,
+    default: "2023"
+  },
+  movieId: {
+    type: String,
+    unique: true
   }
+}, {
+  timestamps: true
 });
 
 module.exports = mongoose.model('Movie', movieSchema);
