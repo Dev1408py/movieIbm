@@ -171,7 +171,7 @@ const AdminMovies = () => {
   const fetchMovies = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch('http://13.232.194.242:5000/api/movies', {
+      const response = await fetch('http://localhost:5000/api/movies', {
         headers: {
           'x-auth-token': token
         }
@@ -203,8 +203,8 @@ const AdminMovies = () => {
     try {
       const token = localStorage.getItem('adminToken');
       const url = editingMovie 
-        ? `http://13.232.194.242:5000/api/movies/${editingMovie._id}`
-        : 'http://13.232.194.242:5000/api/movies';
+        ? `http://localhost:5000/api/movies/${editingMovie._id}`
+        : 'http://localhost:5000/api/movies';
       
       const method = editingMovie ? 'PUT' : 'POST';
 
@@ -264,7 +264,7 @@ const AdminMovies = () => {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://13.232.194.242:5000/api/movies/${movieId}`, {
+      const response = await fetch(`http://localhost:5000/api/movies/${movieId}`, {
         method: 'DELETE',
         headers: {
           'x-auth-token': token

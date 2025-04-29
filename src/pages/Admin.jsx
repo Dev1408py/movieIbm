@@ -20,7 +20,7 @@ const Admin = () => {
         }
 
         console.log('Fetching admin stats...'); // Debug log
-        const response = await fetch('http://13.232.194.242:5000/api/admin/stats', {
+        const response = await fetch('http://localhost:5000/api/admin/stats', {
           headers: {
             'x-auth-token': token,
             'Content-Type': 'application/json'
@@ -218,6 +218,35 @@ const Admin = () => {
         </div>
       </div>
 
+      {/* Movies by Genre */}
+      <div className="bg-white p-6 rounded-lg shadow-sm">
+        <h3 className="text-lg font-semibold mb-4">Movies by Genre</h3>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart 
+            data={stats.recommendationData}
+            layout="vertical"
+            margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis type="number" />
+            <YAxis 
+              dataKey="genre" 
+              type="category" 
+              tick={{ fontSize: 12 }}
+              width={100}
+            />
+            <Tooltip formatter={(value) => [`${value} movies`, 'Count']} />
+            <Legend />
+            <Bar 
+              dataKey="count" 
+              fill="#7C3AED" 
+              name="Number of Movies" 
+              label={{ position: 'right', fill: '#666', fontSize: 12 }}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
       {/* Popular Movies & Feedback */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Popular Movies */}
@@ -239,20 +268,13 @@ const Admin = () => {
         {/* Recent Feedback */}
         <div className="bg-white p-6 rounded-lg shadow-sm">
           <h3 className="text-lg font-semibold mb-4">Recent Feedback</h3>
-          <div className="space-y-4">
-            {stats.recentFeedback.map((feedback, index) => (
-              <div key={index} className="border-b pb-4 last:border-b-0">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium">{feedback.user}</span>
-                  <div className="flex items-center">
-                    <Star className="text-yellow-400" size={16} />
-                    <span className="ml-1">{feedback.rating}/5</span>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm">{feedback.movie}</p>
-                <p className="text-gray-500 text-sm mt-1">{feedback.comment}</p>
-              </div>
-            ))}
+          <div className="flex flex-col items-center justify-center py-10">
+            <div className="bg-indigo-100 text-indigo-800 font-semibold px-4 py-2 rounded-full mb-3">
+              Coming Soon
+            </div>
+            <p className="text-gray-500 text-center">
+              User feedback functionality will be available in the next update.
+            </p>
           </div>
         </div>
       </div>

@@ -22,10 +22,10 @@ const movieSchema = new mongoose.Schema({
     type: String,
     default: "2h"
   },
-  genre: [{
+  genre: {
     type: String,
-    default: ["Action", "Drama"]
-  }],
+    default: "Action"
+  },
   director: {
     type: String,
     default: "Various"

@@ -20,9 +20,16 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 8
   },
+  watchlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }],
+  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }],
+  watchHistory: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }],
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  lastLogin: {
+    type: Date,
+    default: null
   }
 });
 

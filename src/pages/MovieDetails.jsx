@@ -89,16 +89,134 @@
 
 
 // MovieDetails.jsx
-import React from 'react';
-import { X, Star, Clock, Calendar, User, PlayCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Star, Clock, Calendar, User, PlayCircle, Heart, Bookmark } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const MovieDetails = ({ movie, onClose }) => {
+  const navigate = useNavigate();
+  const isLoggedIn = !!localStorage.getItem('token');
+  const [notification, setNotification] = useState('');
+
   // Sample cast data - in a real app, this could come from props or an API
   const cast = [
     { name: "Lead Actor", role: "Main Character" },
     { name: "Supporting Actor", role: "Side Character" },
     { name: "Director", role: "Director" }
   ];
+
+  // Handlers for favorites and watchlist
+  const handleAddToFavorites = async () => {
+    if (!isLoggedIn) {
+      navigate('/login');
+      return;
+    }
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    try {
+      console.log('Adding to favorites:', movie);
+      
+      // Use the correct movie ID format
+      const movieId = movie.id.toString();
+      console.log('Using Movie ID for favorites:', movieId);
+      
+      // Log the request details for debugging
+      console.log('Request URL:', `http://localhost:5000/api/users/${userId}/favorites/${movieId}`);
+      console.log('Request headers:', { 'x-auth-token': token });
+      
+      const response = await fetch(`http://localhost:5000/api/users/${userId}/favorites/${movieId}`, {
+        method: 'POST',
+        headers: { 'x-auth-token': token },
+      });
+      
+      console.log('Response status:', response.status);
+      
+      // Force reload the favorites page to ensure it shows the latest data
+      localStorage.setItem('forceReloadFavorites', 'true');
+      
+      // Show notification
+      setNotification('Added to Favorites');
+      // Clear notification after 2 seconds
+      setTimeout(() => setNotification(''), 2000);
+    } catch (err) {
+      console.error('Error adding to favorites:', err);
+      setNotification('Failed to add to Favorites');
+      setTimeout(() => setNotification(''), 2000);
+    }
+  };
+  
+  const handleAddToWatchlist = async () => {
+    if (!isLoggedIn) {
+      navigate('/login');
+      return;
+    }
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    try {
+      console.log('Adding to watchlist:', movie);
+      
+      // Use the correct movie ID format
+      const movieId = movie.id.toString();
+      console.log('Using Movie ID for watchlist:', movieId);
+      
+      // Log the request details for debugging
+      console.log('Request URL:', `http://localhost:5000/api/users/${userId}/watchlist/${movieId}`);
+      console.log('Request headers:', { 'x-auth-token': token });
+      
+      const response = await fetch(`http://localhost:5000/api/users/${userId}/watchlist/${movieId}`, {
+        method: 'POST',
+        headers: { 'x-auth-token': token },
+      });
+      
+      console.log('Response status:', response.status);
+      
+      // Force reload the watchlist page to ensure it shows the latest data
+      localStorage.setItem('forceReloadWatchlist', 'true');
+      
+      // Show notification
+      setNotification('Added to Watchlist');
+      // Clear notification after 2 seconds
+      setTimeout(() => setNotification(''), 2000);
+    } catch (err) {
+      console.error('Error adding to watchlist:', err);
+      setNotification('Failed to add to Watchlist');
+      setTimeout(() => setNotification(''), 2000);
+    }
+  };
+  
+  const handleWatchNow = async () => {
+    if (!isLoggedIn) {
+      navigate('/login');
+      return;
+    }
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    try {
+      console.log('Adding to history:', movie);
+      
+      // Skip movie creation since it requires admin rights
+      // Just directly add the movie ID to history
+      const movieId = movie.id.toString();
+      console.log('Using Movie ID for history:', movieId);
+      
+      const response = await fetch(`http://localhost:5000/api/users/${userId}/history/${movieId}`, {
+        method: 'POST',
+        headers: { 'x-auth-token': token },
+      });
+      
+      console.log('Response status:', response.status);
+      
+      // Show notification regardless of response
+      setNotification('Added to History');
+      // Clear notification after 2 seconds
+      setTimeout(() => setNotification(''), 2000);
+    } catch (err) {
+      console.error('Error adding to history:', err);
+    }
+    
+    // Navigate to watch page
+    navigate(`/watch/${movie.id}`);
+  };
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 overflow-y-auto">
@@ -204,18 +322,29 @@ const MovieDetails = ({ movie, onClose }) => {
 
             {/* Action Buttons */}
             <div className="flex gap-4">
-              <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full flex items-center gap-2 transition duration-300">
+              <button onClick={handleWatchNow} className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full flex items-center gap-2 transition duration-300">
                 <PlayCircle className="h-5 w-5" />
                 Watch Now
               </button>
-              <button className="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-full flex items-center gap-2 transition duration-300">
-                <PlayCircle className="h-5 w-5" />
-                Watch Trailer
+              <button onClick={handleAddToFavorites} className="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-full flex items-center gap-2 transition duration-300">
+                <Heart className="h-5 w-5" />
+                Favorite
+              </button>
+              <button onClick={handleAddToWatchlist} className="bg-blue-800 hover:bg-blue-700 text-white px-6 py-3 rounded-full flex items-center gap-2 transition duration-300">
+                <Bookmark className="h-5 w-5" />
+                Watchlist
               </button>
             </div>
           </div>
         </div>
       </div>
+      
+      {/* Notification popup */}
+      {notification && (
+        <div className="fixed top-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in-out">
+          {notification}
+        </div>
+      )}
     </div>
   );
 };

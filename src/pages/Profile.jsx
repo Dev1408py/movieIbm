@@ -15,10 +15,14 @@ const Profile = () => {
     newPassword: '',
     confirmPassword: ''
   });
+  const [watchlist, setWatchlist] = useState([]);
+  const [favorites, setFavorites] = useState([]);
+  const [history, setHistory] = useState([]);
 
   useEffect(() => {
     // Check if user is logged in
     const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
     if (!token) {
       navigate('/login');
       return;
@@ -30,6 +34,24 @@ const Profile = () => {
       username: localStorage.getItem('username') || '',
       email: localStorage.getItem('email') || ''
     }));
+
+    // Fetch user lists
+    const fetchLists = async () => {
+      try {
+        const headers = { 'x-auth-token': token };
+        const [wRes, fRes, hRes] = await Promise.all([
+          fetch(`http://localhost:5000/api/users/${userId}/watchlist`, { headers }),
+          fetch(`http://localhost:5000/api/users/${userId}/favorites`, { headers }),
+          fetch(`http://localhost:5000/api/users/${userId}/history`, { headers })
+        ]);
+        setWatchlist(await wRes.json());
+        setFavorites(await fRes.json());
+        setHistory(await hRes.json());
+      } catch (err) {
+        // Optionally handle error
+      }
+    };
+    fetchLists();
   }, [navigate]);
 
   const handleChange = (e) => {
@@ -59,7 +81,7 @@ const Profile = () => {
         }
       }
 
-      const response = await fetch(`http://13.232.194.242:5000/api/users/${userId}`, {
+      const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -246,9 +268,51 @@ const Profile = () => {
             )}
           </form>
         </div>
+        {/* User Lists Section */}
+        <div className="bg-gray-800 rounded-lg shadow-xl p-6 mt-8">
+          <h2 className="text-2xl font-bold mb-4">My Watchlist</h2>
+          {watchlist.length === 0 ? (
+            <p className="text-gray-400 mb-6">No movies in your watchlist yet.</p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              {watchlist.map(movie => (
+                <div key={movie._id} className="bg-gray-700 rounded-lg p-3 flex flex-col items-center">
+                  <img src={movie.image} alt={movie.title} className="w-full h-32 object-cover rounded mb-2" />
+                  <span className="text-white font-semibold text-center">{movie.title}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <h2 className="text-2xl font-bold mb-4 mt-8">My Favorites</h2>
+          {favorites.length === 0 ? (
+            <p className="text-gray-400 mb-6">No favorite movies yet.</p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              {favorites.map(movie => (
+                <div key={movie._id} className="bg-gray-700 rounded-lg p-3 flex flex-col items-center">
+                  <img src={movie.image} alt={movie.title} className="w-full h-32 object-cover rounded mb-2" />
+                  <span className="text-white font-semibold text-center">{movie.title}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <h2 className="text-2xl font-bold mb-4 mt-8">Watch History</h2>
+          {history.length === 0 ? (
+            <p className="text-gray-400">No watch history yet.</p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {history.map(movie => (
+                <div key={movie._id} className="bg-gray-700 rounded-lg p-3 flex flex-col items-center">
+                  <img src={movie.image} alt={movie.title} className="w-full h-32 object-cover rounded mb-2" />
+                  <span className="text-white font-semibold text-center">{movie.title}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-export default Profile; 
+export default Profile;

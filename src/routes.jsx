@@ -11,6 +11,9 @@ import AdminMovies from "./pages/AdminMovies";
 import AdminUsers from "./pages/AdminUsers";
 import Profile from "./pages/Profile";
 import WatchMovie from "./pages/WatchMovie";
+import Favorites from "./pages/Favorites";
+import Watchlist from "./pages/Watchlist";
+import History from "./pages/History";
 
 // Protected Route component for admin dashboard
 const ProtectedAdminRoute = ({ children }) => {
@@ -72,6 +75,21 @@ const AppRoutes = () => {
       <Route path="/watch/:movieId" element={
         <ProtectedRoute>
           <WatchMovie />
+        </ProtectedRoute>
+      } />
+      <Route path="/favorites" element={
+        <ProtectedRoute>
+          <Favorites />
+        </ProtectedRoute>
+      } />
+      <Route path="/watchlist" element={
+        <ProtectedRoute>
+          <Watchlist />
+        </ProtectedRoute>
+      } />
+      <Route path="/history" element={
+        <ProtectedRoute>
+          <History />
         </ProtectedRoute>
       } />
     </Routes>

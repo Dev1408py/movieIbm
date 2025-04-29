@@ -119,10 +119,9 @@ router.get('/stats', authenticateAdmin, async (req, res) => {
 
     // Get genre distribution
     const genreData = await Movie.aggregate([
-      { $unwind: '$genres' },
       {
         $group: {
-          _id: '$genres',
+          _id: '$genre',
           count: { $sum: 1 }
         }
       },
@@ -137,10 +136,9 @@ router.get('/stats', authenticateAdmin, async (req, res) => {
 
     // Get movie recommendations by genre
     const recommendationData = await Movie.aggregate([
-      { $unwind: '$genres' },
       {
         $group: {
-          _id: '$genres',
+          _id: '$genre',
           count: { $sum: 1 }
         }
       },

@@ -73,7 +73,7 @@ function Signup() {
     if (Object.keys(newErrors).length === 0) {
       setLoading(true);
       try {
-        const response = await fetch('http://13.232.194.242:5000/api/users/signup', {
+        const response = await fetch('http://localhost:5000/api/users/signup', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
