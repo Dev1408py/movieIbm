@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import host from "../../Link.js";
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -73,7 +74,7 @@ function Signup() {
     if (Object.keys(newErrors).length === 0) {
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:5000/api/users/signup', {
+        const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/signup`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

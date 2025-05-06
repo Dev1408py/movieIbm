@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Trash2 } from 'lucide-react';
+import host from "../../Link.js";
 
 const Watchlist = () => {
   const [watchlist, setWatchlist] = useState([]);
@@ -19,8 +21,8 @@ const Watchlist = () => {
       
       try {
         console.log('Fetching watchlist...');
-        const response = await fetch(`http://localhost:5000/api/users/${userId}/watchlist`, {
-          headers: { 'x-auth-token': token },
+        const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/watchlist`, {
+            headers: { 'x-auth-token': token },
         });
         
         if (!response.ok) {
@@ -96,9 +98,11 @@ const Watchlist = () => {
     
     try {
       const movieId = movie.id || movie._id;
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/watchlist/${movieId}`, {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/watchlist/${movieId}`, {
         method: 'DELETE',
-        headers: { 'x-auth-token': token },
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       
       if (response.ok) {

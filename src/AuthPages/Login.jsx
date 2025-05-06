@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../config';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -42,7 +43,7 @@ function Login() {
     if (Object.keys(newErrors).length === 0) {
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:5000/api/users/login', {
+        const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

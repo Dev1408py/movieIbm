@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer, Label } from 'recharts';
-import { Users, Film, TrendingUp, Clock, Star, Settings, List, User } from 'lucide-react';
+import { Users, Film, TrendingUp, Clock, Star, Settings, List, User, ChartBar, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import host from "../../Link.js";
 
 const Admin = () => {
   const [loading, setLoading] = useState(true);
@@ -20,7 +21,7 @@ const Admin = () => {
         }
 
         console.log('Fetching admin stats...'); // Debug log
-        const response = await fetch('http://localhost:5000/api/admin/stats', {
+        const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/admin/stats`, {
           headers: {
             'x-auth-token': token,
             'Content-Type': 'application/json'
@@ -118,7 +119,9 @@ const Admin = () => {
       {/* Navigation Bar */}
       <div className="bg-white rounded-lg shadow-sm p-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+        <button className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+  <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+</button>
           <div className="flex space-x-4">
             <button
               onClick={() => navigate('/admin/movies')}

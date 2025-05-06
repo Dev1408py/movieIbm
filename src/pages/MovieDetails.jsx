@@ -89,9 +89,10 @@
 
 
 // MovieDetails.jsx
-import React, { useState } from 'react';
-import { X, Star, Clock, Calendar, User, PlayCircle, Heart, Bookmark } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Star, Clock, Heart, Bookmark, Play, X } from 'lucide-react';
+import host from "../../Link.js";
 
 const MovieDetails = ({ movie, onClose }) => {
   const navigate = useNavigate();
@@ -121,12 +122,14 @@ const MovieDetails = ({ movie, onClose }) => {
       console.log('Using Movie ID for favorites:', movieId);
       
       // Log the request details for debugging
-      console.log('Request URL:', `http://localhost:5000/api/users/${userId}/favorites/${movieId}`);
-      console.log('Request headers:', { 'x-auth-token': token });
+      console.log('Request URL:', `${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/favorites/${movieId}`);
       
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/favorites/${movieId}`, {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/favorites/${movieId}`, {
         method: 'POST',
-        headers: { 'x-auth-token': token },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
       });
       
       console.log('Response status:', response.status);
@@ -160,12 +163,14 @@ const MovieDetails = ({ movie, onClose }) => {
       console.log('Using Movie ID for watchlist:', movieId);
       
       // Log the request details for debugging
-      console.log('Request URL:', `http://localhost:5000/api/users/${userId}/watchlist/${movieId}`);
-      console.log('Request headers:', { 'x-auth-token': token });
+      console.log('Request URL:', `${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/watchlist/${movieId}`);
       
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/watchlist/${movieId}`, {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/watchlist/${movieId}`, {
         method: 'POST',
-        headers: { 'x-auth-token': token },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
       });
       
       console.log('Response status:', response.status);
@@ -199,9 +204,13 @@ const MovieDetails = ({ movie, onClose }) => {
       const movieId = movie.id.toString();
       console.log('Using Movie ID for history:', movieId);
       
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/history/${movieId}`, {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/history/${movieId}`, {
         method: 'POST',
-        headers: { 'x-auth-token': token },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ title: movie.title })
       });
       
       console.log('Response status:', response.status);

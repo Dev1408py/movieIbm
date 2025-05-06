@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import host from "../../Link.js";
 
 const History = () => {
   const [history, setHistory] = useState([]);
@@ -19,7 +20,7 @@ const History = () => {
       
       try {
         console.log('Fetching watch history...');
-        const response = await fetch(`http://localhost:5000/api/users/${userId}/history`, {
+        const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/history`, {
           headers: { 'x-auth-token': token },
         });
         
@@ -96,7 +97,7 @@ const History = () => {
     
     try {
       const movieId = movie.id || movie._id;
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/history/${movieId}`, {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/history/${movieId}`, {
         method: 'DELETE',
         headers: { 'x-auth-token': token },
       });

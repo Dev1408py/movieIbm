@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play, Star, Clock, TrendingUp as Trending, ThumbsUp, Award, Search, User, Heart, Bookmark } from 'lucide-react';
+import host from "../../Link.js";
 
 const Home = () => {
   const [selectedMovie, setSelectedMovie] = useState(null);
@@ -48,7 +49,7 @@ const Home = () => {
       setLoading(true);
       try {
         console.log('Fetching movies from backend...');
-        const response = await fetch('http://localhost:5000/api/movies');
+        const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/movies`);
         
         if (!response.ok) {
           console.error('Error fetching movies:', response.status);
@@ -130,7 +131,7 @@ const Home = () => {
       
       // First, try the recommendation endpoint
       try {
-        const response = await fetch('http://localhost:8000/recommend', {
+        const response = await fetch(`http://localhost:8000/recommend`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -147,6 +148,7 @@ const Home = () => {
         const data = await response.json();
         if (response.ok) {
           // Update recommendations
+          console.log('Recommendations from the aws', data);
           const recommendedMovies = data.recommendations.map(rec => {
             // Find the movie in our movies array or create a new one
             const existingMovie = movies.find(m => m.title.toLowerCase() === rec.Name.toLowerCase());
@@ -210,6 +212,7 @@ const Home = () => {
   };
 
   const handleLogout = () => {
+    alert(`User -->${localStorage.getItem('username')}, You have logged out successfully!`);
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('username');
@@ -248,10 +251,10 @@ const Home = () => {
       console.log('Using Movie ID for favorites:', movieId);
       
       // Log the request details for debugging
-      console.log('Request URL:', `http://localhost:5000/api/users/${userId}/favorites/${movieId}`);
+      console.log('Request URL:', `${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/favorites/${movieId}`);
       console.log('Request headers:', { 'x-auth-token': token });
       
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/favorites/${movieId}`, {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/favorites/${movieId}`, {
         method: 'POST',
         headers: { 'x-auth-token': token },
       });
@@ -285,10 +288,10 @@ const Home = () => {
       console.log('Using Movie ID for watchlist:', movieId);
       
       // Log the request details for debugging
-      console.log('Request URL:', `http://localhost:5000/api/users/${userId}/watchlist/${movieId}`);
+      console.log('Request URL:', `${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/watchlist/${movieId}`);
       console.log('Request headers:', { 'x-auth-token': token });
       
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/watchlist/${movieId}`, {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/watchlist/${movieId}`, {
         method: 'POST',
         headers: { 'x-auth-token': token },
       });
@@ -383,7 +386,7 @@ const Home = () => {
   );
 
   const MovieDetails = ({ movie, onClose }) => (
-    <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4">
       <div className="bg-gray-900 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="relative">
           <button 
@@ -456,7 +459,7 @@ const Home = () => {
               // Add to history
               const token = localStorage.getItem('token');
               const userId = localStorage.getItem('userId');
-              await fetch(`http://localhost:5000/api/users/${userId}/history/${movie.id}`, {
+              await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/history/${movie.id}`, {
                 method: 'POST', headers: { 'x-auth-token': token }
               });
               navigate(`/watch/${movie.id}`);
@@ -473,7 +476,7 @@ const Home = () => {
   return (
     <div className="pt-16 bg-gray-900 min-h-screen">
       {/* Search Bar with User Dropdown */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-30 bg-gray-900">
         <div className="flex items-center gap-4">
           <div className="flex items-center mr-4">
             <h1 onClick={() => navigate('/')} className="text-red-600 text-2xl font-bold cursor-pointer">MRS</h1>
@@ -491,7 +494,7 @@ const Home = () => {
             </div>
             
             {searchQuery && (
-              <div className="absolute top-full left-0 right-0 bg-gray-800 rounded-lg mt-2 max-h-96 overflow-y-auto z-10 shadow-xl">
+              <div className="absolute top-full left-0 right-0 bg-gray-800 rounded-lg mt-2 max-h-96 overflow-y-auto z-40 shadow-xl">
                 {filteredMovies.map(movie => (
                   <div
                     key={movie.id}
@@ -550,7 +553,7 @@ const Home = () => {
             </button>
             
             {showUserDropdown && (
-              <div className="absolute right-0 mt-2 w-56 bg-gray-800 rounded-md shadow-lg py-1 z-20 border border-gray-700">
+              <div className="absolute right-0 mt-2 w-56 bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-700">
                 {isLoggedIn ? (
                   <>
                     <div className="px-4 py-3 border-b border-gray-700">
@@ -643,7 +646,7 @@ const Home = () => {
 
       {/* Hero Section - Slideshow */}
       {featuredMovies.length > 0 && (
-        <div className="relative h-[70vh] w-full bg-gray-900 overflow-hidden">
+        <div className="relative h-[70vh] w-full bg-gray-900 overflow-hidden z-10">
           {/* Slideshow Images */}
           {featuredMovies.map((movie, index) => (
             <div 

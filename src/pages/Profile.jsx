@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, Calendar, Key, Save, X } from 'lucide-react';
+import host from "../../Link.js";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -40,9 +41,9 @@ const Profile = () => {
       try {
         const headers = { 'x-auth-token': token };
         const [wRes, fRes, hRes] = await Promise.all([
-          fetch(`http://localhost:5000/api/users/${userId}/watchlist`, { headers }),
-          fetch(`http://localhost:5000/api/users/${userId}/favorites`, { headers }),
-          fetch(`http://localhost:5000/api/users/${userId}/history`, { headers })
+          fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/watchlist`, { headers }),
+          fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/favorites`, { headers }),
+          fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/history`, { headers })
         ]);
         setWatchlist(await wRes.json());
         setFavorites(await fRes.json());
@@ -81,7 +82,7 @@ const Profile = () => {
         }
       }
 
-      const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/update/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -90,8 +91,7 @@ const Profile = () => {
         body: JSON.stringify({
           username: formData.username,
           email: formData.email,
-          currentPassword: formData.currentPassword,
-          newPassword: formData.newPassword
+          password: formData.newPassword || undefined
         })
       });
 

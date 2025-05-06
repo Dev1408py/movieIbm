@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { Plus, Edit2, Trash2, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Film } from 'lucide-react';
+import host from "../../Link.js";
 
 // Memoized MovieModal component
 const MovieModal = memo(({ 
@@ -170,20 +171,28 @@ const AdminMovies = () => {
 
   const fetchMovies = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem('adminToken');
-      const response = await fetch('http://localhost:5000/api/movies', {
+      
+      console.log('Fetching movies with token:', token ? 'Valid token' : 'No token');
+      
+      const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/movies`, {
         headers: {
           'x-auth-token': token
         }
       });
 
+      console.log('Movies API response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch movies');
+        throw new Error(`Failed to fetch movies: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log(`Fetched ${data.length} movies`);
       setMovies(data);
     } catch (err) {
+      console.error('Error fetching movies:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -203,8 +212,29 @@ const AdminMovies = () => {
     try {
       const token = localStorage.getItem('adminToken');
       const url = editingMovie 
-        ? `http://localhost:5000/api/movies/${editingMovie._id}`
-        : 'http://localhost:5000/api/movies';
+        ? `${import.meta.env.VITE_APP_API_HOST}/api/movies/${editingMovie._id}`
+        : `${import.meta.env.VITE_APP_API_HOST}/api/movies`;
+      
+      console.log('Movie action:', editingMovie ? 'Update' : 'Create');
+      console.log('Using URL:', url);
+      console.log('Movie data:', formData);
+      
+      // Ensure genre is always an array even if empty
+      let genreArray = [];
+      if (formData.genre && typeof formData.genre === 'string') {
+        genreArray = formData.genre.split(',').map(g => g.trim()).filter(g => g);
+      } else if (Array.isArray(formData.genre)) {
+        genreArray = formData.genre;
+      }
+      
+      console.log('Processed genre array:', genreArray);
+      
+      const movieData = {
+        ...formData,
+        genre: genreArray
+      };
+      
+      console.log('Final movie data being sent:', movieData);
       
       const method = editingMovie ? 'PUT' : 'POST';
 
@@ -214,14 +244,26 @@ const AdminMovies = () => {
           'Content-Type': 'application/json',
           'x-auth-token': token
         },
-        body: JSON.stringify({
-          ...formData,
-          genre: formData.genre.split(',').map(g => g.trim())
-        })
+        body: JSON.stringify(movieData)
       });
 
+      console.log('Response status:', response.status);
+      
+      // Safely parse the response
+      const responseText = await response.text();
+      let responseData;
+      
+      try {
+        responseData = responseText ? JSON.parse(responseText) : {};
+        console.log('Response data:', responseData);
+      } catch (error) {
+        console.error('Error parsing response:', error);
+        console.log('Raw response:', responseText);
+        responseData = { message: 'Invalid server response' };
+      }
+
       if (!response.ok) {
-        throw new Error('Failed to save movie');
+        throw new Error(responseData.message || 'Failed to save movie');
       }
 
       setShowModal(false);
@@ -238,22 +280,45 @@ const AdminMovies = () => {
       });
       fetchMovies();
     } catch (err) {
-      setError(err.message);
+      console.error('Error in handleSubmit:', err);
+      setError(err.message || 'An unexpected error occurred');
     }
   };
 
   const handleEdit = (movie) => {
+    console.log('Editing movie:', movie);
+    
+    // Format genre properly, handling both array and string formats
+    let genreValue = '';
+    if (Array.isArray(movie.genre)) {
+      genreValue = movie.genre.join(', ');
+    } else if (typeof movie.genre === 'string') {
+      genreValue = movie.genre;
+    }
+    
     setEditingMovie(movie);
     setFormData({
-      title: movie.title,
-      description: movie.description,
-      image: movie.image,
-      rating: movie.rating,
-      duration: movie.duration,
-      genre: movie.genre.join(', '),
-      director: movie.director,
-      year: movie.year
+      title: movie.title || '',
+      description: movie.description || '',
+      image: movie.image || '',
+      rating: movie.rating || '',
+      duration: movie.duration || '',
+      genre: genreValue,
+      director: movie.director || '',
+      year: movie.year || ''
     });
+    
+    console.log('Form data set for editing:', {
+      title: movie.title || '',
+      description: movie.description || '',
+      image: movie.image || '',
+      rating: movie.rating || '',
+      duration: movie.duration || '',
+      genre: genreValue,
+      director: movie.director || '',
+      year: movie.year || ''
+    });
+    
     setShowModal(true);
   };
 
@@ -264,7 +329,7 @@ const AdminMovies = () => {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:5000/api/movies/${movieId}`, {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/movies/${movieId}`, {
         method: 'DELETE',
         headers: {
           'x-auth-token': token
@@ -300,7 +365,11 @@ const AdminMovies = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Manage Movies</h2>
+      <div className="m-2">
+  <h2 className="text-2xl font-bold inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-md shadow-sm">
+    Manage Movies
+  </h2>
+</div>
         <button
           onClick={() => {
             setEditingMovie(null);

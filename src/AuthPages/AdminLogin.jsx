@@ -1,5 +1,6 @@
 import React, { useState, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import host from "../../Link.js";
 
 const MovieModal = memo(({ 
   showModal, 
@@ -39,7 +40,7 @@ const AdminLogin = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/admin/login', {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/admin/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

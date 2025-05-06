@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import host from "../../Link.js";
 
 const Favorites = () => {
   const [favorites, setFavorites] = useState([]);
@@ -19,7 +20,7 @@ const Favorites = () => {
       
       try {
         console.log('Fetching favorites...');
-        const response = await fetch(`http://localhost:5000/api/users/${userId}/favorites`, {
+        const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/favorites`, {
           headers: { 'x-auth-token': token },
         });
         
@@ -96,7 +97,7 @@ const Favorites = () => {
     
     try {
       const movieId = movie.id || movie._id;
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/favorites/${movieId}`, {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/users/${userId}/favorites/${movieId}`, {
         method: 'DELETE',
         headers: { 'x-auth-token': token },
       });

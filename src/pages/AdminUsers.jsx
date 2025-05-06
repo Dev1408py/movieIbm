@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { Plus, Edit2, Trash2, X, User } from 'lucide-react';
+import host from "../../Link.js";
 
 // Memoized UserModal component
 const UserModal = memo(({ 
@@ -70,9 +71,9 @@ const UserModal = memo(({
               onChange={onInputChange}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               required
+              disabled
             >
               <option value="user">User</option>
-              <option value="admin">Admin</option>
             </select>
           </div>
 
@@ -116,8 +117,9 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem('adminToken');
-      const response = await fetch('http://localhost:5000/api/admin/users', {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/admin/users`, {
         headers: {
           'x-auth-token': token
         }
@@ -128,8 +130,10 @@ const AdminUsers = () => {
       }
 
       const data = await response.json();
+      console.log('Fetched users:', data);
       setUsers(data);
     } catch (err) {
+      console.error('Error fetching users:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -149,16 +153,28 @@ const AdminUsers = () => {
     try {
       const token = localStorage.getItem('adminToken');
       const url = editingUser 
-        ? `http://localhost:5000/api/admin/users/${editingUser._id}`
-        : 'http://localhost:5000/api/admin/users';
+        ? `${import.meta.env.VITE_APP_API_HOST}/api/admin/users/${editingUser._id}`
+        : `${import.meta.env.VITE_APP_API_HOST}/api/admin/users`;
+      
+      console.log('Update URL:', url);
+      console.log('Using method:', editingUser ? 'PUT' : 'POST');
+      console.log('User being edited:', editingUser);
       
       const method = editingUser ? 'PUT' : 'POST';
 
-      // If editing and password is empty, remove it from the request
-      const requestData = { ...formData };
-      if (editingUser && !requestData.password) {
-        delete requestData.password;
+      // Prepare the request data directly with username instead of name
+      const requestData = {
+        username: formData.name, // Convert name to username directly
+        email: formData.email,
+        role: 'user'
+      };
+      
+      // Only include password if provided and not empty
+      if (formData.password && formData.password.trim()) {
+        requestData.password = formData.password;
       }
+      
+      console.log('Sending user data:', requestData);
 
       const response = await fetch(url, {
         method,
@@ -169,9 +185,21 @@ const AdminUsers = () => {
         body: JSON.stringify(requestData)
       });
 
+      console.log('Response status:', response.status);
+      
+      // Handle the response properly
+      const responseText = await response.text();
+      let responseData;
+      try {
+        responseData = responseText ? JSON.parse(responseText) : {};
+        console.log('Response data:', responseData);
+      } catch (e) {
+        console.error('Error parsing response:', e);
+        responseData = { message: 'Invalid response from server' };
+      }
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to save user');
+        throw new Error(responseData.message || 'Failed to save user');
       }
 
       setShowModal(false);
@@ -184,6 +212,7 @@ const AdminUsers = () => {
       });
       fetchUsers();
     } catch (err) {
+      console.error('Error in handleSubmit:', err);
       setError(err.message);
     }
   };
@@ -191,10 +220,10 @@ const AdminUsers = () => {
   const handleEdit = (user) => {
     setEditingUser(user);
     setFormData({
-      name: user.name,
+      name: user.username || user.name,
       email: user.email,
       password: '', // Password will be optional when editing
-      role: user.role
+      role: 'user' // Always set to user
     });
     setShowModal(true);
   };
@@ -206,7 +235,7 @@ const AdminUsers = () => {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_HOST}/api/admin/users/${userId}`, {
         method: 'DELETE',
         headers: {
           'x-auth-token': token
@@ -243,7 +272,11 @@ const AdminUsers = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Manage Users</h2>
+      <div className="m-2">
+  <h2 className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-2xl font-bold">
+    Manage Users
+  </h2>
+</div>
         <button
           onClick={() => {
             setEditingUser(null);
@@ -281,7 +314,7 @@ const AdminUsers = () => {
                       <User className="h-10 w-10 text-gray-400" />
                     </div>
                     <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                      <div className="text-sm font-medium text-gray-900">{user.username || user.name}</div>
                     </div>
                   </div>
                 </td>
@@ -289,12 +322,8 @@ const AdminUsers = () => {
                   <div className="text-sm text-gray-900">{user.email}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    user.role === 'admin' 
-                      ? 'bg-purple-100 text-purple-800' 
-                      : 'bg-green-100 text-green-800'
-                  }`}>
-                    {user.role}
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    User
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
